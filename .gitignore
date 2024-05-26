@@ -1,0 +1,4 @@
+.env
+/db_data/
+/app/vendor/
+/app/public/info.php

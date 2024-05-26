@@ -1,0 +1,46 @@
+services:
+  
+  chore_php:
+    build:
+      context: .
+      dockerfile: php.Dockerfile
+    env_file: .env
+    volumes:
+      - ./app:/var/www/html
+      - /var/www/html/vendor
+    ports:
+      - "8084:80"
+    depends_on:
+      - chore_db
+    networks:
+      - chore_network
+
+  chore_db:
+    image: mariadb:11.2
+    volumes:
+      - ./db_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MARIADB_DATABASE: ${DB_NAME}
+      MARIADB_USER: ${DB_USER}
+      MARIADB_PASSWORD: ${DB_PASS}
+      TZ: America/Denver
+    ports:
+      - "3314:3306"
+    networks:
+      - chore_network
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    environment:
+      PMA_HOST: chore_db
+    ports:
+      - "8089:80"
+    depends_on:
+      - chore_db
+    networks:
+      - chore_network
+
+networks:
+  chore_network:
